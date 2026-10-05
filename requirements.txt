@@ -1,3 +1,4 @@
+# Modified by nawta, 2025-2026: see NOTICE.
 basicsr==1.4.2
 kornia==0.5.1
 face-alignment==1.3.4

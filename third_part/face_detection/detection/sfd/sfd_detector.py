@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: torch.load with map_location='cpu'. See NOTICE.
 import os
 import cv2
 from torch.utils.model_zoo import load_url
@@ -21,7 +22,7 @@ class SFDDetector(FaceDetector):
         if not os.path.isfile(path_to_detector):
             model_weights = load_url(models_urls['s3fd'])
         else:
-            model_weights = torch.load(path_to_detector)
+            model_weights = torch.load(path_to_detector, map_location='cpu')
 
         self.face_detector = s3fd()
         self.face_detector.load_state_dict(model_weights)

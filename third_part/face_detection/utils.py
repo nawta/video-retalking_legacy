@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: np.int -> int (NumPy >= 1.24). See NOTICE.
 from __future__ import print_function
 import os
 import sys

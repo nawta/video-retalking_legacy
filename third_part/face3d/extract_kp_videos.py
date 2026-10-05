@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: LandmarksType.TWO_D fallback for face-alignment >= 1.4. See NOTICE.
 import os
 import cv2
 import time

@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: imports utils/torchvision_compat.py before basicsr. See NOTICE.
 # Prediction interface for Cog ⚙️
 # https://github.com/replicate/cog/blob/main/docs/python.md
 

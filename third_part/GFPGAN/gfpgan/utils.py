@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: torch.load with map_location='cpu'. See NOTICE.
 import cv2
 import os
 import torch
@@ -84,7 +85,7 @@ class GFPGANer():
         if model_path.startswith('https://'):
             model_path = load_file_from_url(
                 url=model_path, model_dir=os.path.join(ROOT_DIR, 'gfpgan/weights'), progress=True, file_name=None)
-        loadnet = torch.load(model_path)
+        loadnet = torch.load(model_path, map_location='cpu')
         if 'params_ema' in loadnet:
             keyname = 'params_ema'
         else:

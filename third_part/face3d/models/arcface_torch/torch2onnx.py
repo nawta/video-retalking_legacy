@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: np.float -> float (NumPy >= 1.24). See NOTICE.
 import numpy as np
 import onnx
 import torch

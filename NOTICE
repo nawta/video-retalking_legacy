@@ -3,13 +3,14 @@ Copyright the VideoReTalking authors (https://github.com/OpenTalker/video-retalk
 licensed under the Apache License, Version 2.0 (see LICENSE).
 
 This repository is a modified copy of OpenTalker/video-retalking at commit d32e8e5.
-Files changed or added by nawta (2025-2026), as required by section 4(b) of the license:
+Files changed or added by nawta (2025-2026), as required by section 4(b) of the license.
+Each modified source file also starts with a "Modified by nawta" comment.
 
 Modified files
 - README.md: added a section about this fork; updated install steps.
 - requirements.txt: dlib 19.24.0 -> 19.24.6; numpy pinned to 2.2.6 instead of 1.23.4;
-  added scikit-image 0.24.0, tqdm, and setuptools<81.
-- .python-version: set to the tested Python version.
+  added scikit-image 0.24.0, tqdm, and setuptools<81. An earlier commit in this fork also added
+  pytorch-insightface, which nothing imports; it was removed again.
 - inference.py, predict.py: import utils/torchvision_compat.py before basicsr.
 - third_part/face3d/util/preprocess.py: removed the np.VisibleDeprecationWarning filter
   (the class no longer exists in NumPy 2).
@@ -20,9 +21,14 @@ Modified files
   third_part/face3d/models/arcface_torch/torch2onnx.py,
   third_part/face3d/models/arcface_torch/utils/plot.py: np.int -> int and
   np.float -> float (removed in NumPy 1.24).
+- utils/inference_utils.py, third_part/face_detection/detection/sfd/sfd_detector.py,
+  third_part/GPEN/face_parse/parse_model.py, third_part/GPEN/face_parse/face_parsing.py,
+  third_part/GFPGAN/gfpgan/utils.py: torch.load with map_location='cpu', so checkpoints
+  saved on a GPU load on machines without CUDA.
 
 Added files
 - NOTICE: this file.
+- .python-version: the tested Python version (3.10).
 - utils/torchvision_compat.py: maps torchvision.transforms.functional_tensor to
   torchvision.transforms.functional so that basicsr 1.4.2 imports on torchvision 0.17 and later.
 - train.py: an unfinished training script skeleton. It is not part of upstream and does not run

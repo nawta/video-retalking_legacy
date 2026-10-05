@@ -9,6 +9,8 @@ This fork of [OpenTalker/video-retalking](https://github.com/OpenTalker/video-re
 - `third_part/face3d/util/preprocess.py`: removed the `np.VisibleDeprecationWarning` filter (upstream issue #274).
 - `third_part/face_detection/utils.py` and four evaluation scripts under `third_part/face3d/models/arcface_torch/`: `np.int` and `np.float` replaced with `int` and `float`.
 - `requirements.txt`: dlib 19.24.6 in place of 19.24.0, numpy 2.2.6 in place of 1.23.4, and scikit-image 0.24.0, tqdm, and `setuptools<81` added. librosa 0.9.2 needs `pkg_resources`, which setuptools 81 removed.
+- `utils/inference_utils.py`, the S3FD detector, the GPEN face parser, and GFPGAN: `torch.load` uses `map_location='cpu'`, so checkpoints saved on a GPU load without CUDA. `load_state_dict` then copies the weights to the model's device.
+- Each modified source file starts with a `# Modified by nawta` comment.
 - `train.py` (new, not from upstream): see "About train.py" below.
 
 ## Errors this fork fixes
@@ -31,12 +33,14 @@ cd video-retalking_legacy
 uv venv -p 3.10
 source .venv/bin/activate
 uv pip install torch torchvision
-uv pip install -r requirements.txt
+grep -v '^dlib' requirements.txt > requirements-macos.txt
+uv pip install -r requirements-macos.txt
+uv pip install dlib-bin
 ```
 
-You also need the `ffmpeg` command. On a CUDA machine, pick the `torch` build for your CUDA version from <https://pytorch.org/get-started/locally/>.
+These commands were run in a new environment and `python inference.py --help` then worked. They install the prebuilt `dlib-bin` package (20.0.1.post1) in place of `dlib==19.24.6`, because building dlib 19.24.6 from source failed on the Apple Silicon Mac used for testing. With an Intel (Rosetta) `cmake` on the PATH, it built an x86_64 module that Python could not load. With an arm64 `cmake`, the bundled libpng failed with `fatal error: 'fp.h' file not found`. Installing the full `requirements.txt` on Linux was not tested.
 
-On the Apple Silicon Mac used for testing, building dlib 19.24.6 from source failed. With an Intel (Rosetta) `cmake` on the PATH, it built an x86_64 module that Python could not load. With an arm64 `cmake`, the bundled libpng failed with `fatal error: 'fp.h' file not found`. The test below used the prebuilt `dlib-bin` package (20.0.1.post1) instead: `uv pip uninstall dlib && uv pip install dlib-bin`.
+You also need the `ffmpeg` command. On a CUDA machine, pick the `torch` build for your CUDA version from <https://pytorch.org/get-started/locally/>.
 
 The pretrained models are listed in the upstream section below. They total about 3.9 GB and come from <https://github.com/vinthony/video-retalking/releases/tag/v0.0.1>.
 
@@ -52,6 +56,10 @@ Only installation and imports were tested. Full inference was not run because th
 | `python inference.py --help` | All imports succeed and the help text prints |
 | `utils/audio.py` | Computes an (80, 161) mel spectrogram from a 2 s test tone |
 | `LandmarksType` fallback | Checked against face-alignment 1.3.4 and 1.5.0 |
+
+## Known risks
+
+Full inference has not been run with the real checkpoints. Since PyTorch 2.6, `torch.load` defaults to `weights_only=True`. Checkpoints that store more than tensors and plain containers (for example, pickled Python objects) then fail to load with an `UnpicklingError`. If that happens, pass `weights_only=False` to the failing `torch.load` call, and only do so for checkpoints from a source you trust.
 
 ## About train.py
 

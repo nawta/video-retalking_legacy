@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: removed the np.VisibleDeprecationWarning filter (NumPy 2). See NOTICE.
 """
 This script contains the image preprocessing code for Deep3DFaceRecon_pytorch
 """

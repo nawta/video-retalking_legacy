@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: torch.load with map_location='cpu'. See NOTICE.
 '''
 @Created by chaofengc (chaofenghust@gmail.com)
 
@@ -14,7 +15,7 @@ def define_P(in_size=512, out_size=512, min_feat_size=32, relu_type='LeakyReLU',
     if not isTrain:
         net.eval()  
     if weight_path is not None:
-        net.load_state_dict(torch.load(weight_path))
+        net.load_state_dict(torch.load(weight_path, map_location='cpu'))
     return net
 
 

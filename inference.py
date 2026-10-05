@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: imports utils/torchvision_compat.py before basicsr. See NOTICE.
 import numpy as np
 import cv2, os, sys, subprocess, platform, torch
 from tqdm import tqdm

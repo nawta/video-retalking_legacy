@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: torch.load with map_location='cpu'. See NOTICE.
 '''
 @paper: GAN Prior Embedded Network for Blind Face Restoration in the Wild (CVPR2021)
 @author: yangxy (yangtao9009@gmail.com)
@@ -112,7 +113,7 @@ class FaceParse_v2(object):
 
     def load_model(self):
         self.faceparse = BiSeNet(n_classes=19)
-        self.faceparse.load_state_dict(torch.load(self.mfile))
+        self.faceparse.load_state_dict(torch.load(self.mfile, map_location='cpu'))
         self.faceparse.to(self.device)
         self.faceparse.eval()
 

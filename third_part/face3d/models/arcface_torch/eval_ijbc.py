@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: np.int -> int (NumPy >= 1.24). See NOTICE.
 # coding: utf-8
 
 import os

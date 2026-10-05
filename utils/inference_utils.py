@@ -1,3 +1,4 @@
+# Modified by nawta, 2026: torch.load with map_location='cpu'. See NOTICE.
 import numpy as np
 import cv2, argparse, torch
 import torchvision.transforms.functional as TF
@@ -147,11 +148,8 @@ def face_detect(images, args, jaw_correction=False, detector=None):
     return results 
 
 def _load(checkpoint_path, device):
-    if device == 'cuda':
-        checkpoint = torch.load(checkpoint_path)
-    else:
-        checkpoint = torch.load(checkpoint_path,
-                                map_location=lambda storage, loc: storage)
+    # Load on the CPU; load_state_dict copies the weights to the model's device.
+    checkpoint = torch.load(checkpoint_path, map_location='cpu')
     return checkpoint
 
 def split_coeff(coeffs):
