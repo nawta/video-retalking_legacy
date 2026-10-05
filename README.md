@@ -1,3 +1,68 @@
+# video-retalking_legacy
+
+This fork of [OpenTalker/video-retalking](https://github.com/OpenTalker/video-retalking) installs and imports on Python 3.10 with PyTorch 2 and NumPy 2. The models and inference code are the upstream ones. The upstream README follows below, from the VideoReTalking title onward. All changed files are listed in [NOTICE](NOTICE).
+
+## Changes from upstream
+
+- `utils/torchvision_compat.py` (new), imported at the top of `inference.py` and `predict.py`: basicsr 1.4.2 imports `torchvision.transforms.functional_tensor`, which torchvision 0.17 removed. The new module registers `torchvision.transforms.functional` under the old name, so basicsr itself is left unpatched.
+- `third_part/face3d/extract_kp_videos.py` and `utils/alignment_stit.py`: use `LandmarksType.TWO_D` when face-alignment has it (1.4 and later) and fall back to `LandmarksType._2D` for 1.3.x.
+- `third_part/face3d/util/preprocess.py`: removed the `np.VisibleDeprecationWarning` filter (upstream issue #274).
+- `third_part/face_detection/utils.py` and four evaluation scripts under `third_part/face3d/models/arcface_torch/`: `np.int` and `np.float` replaced with `int` and `float`.
+- `requirements.txt`: dlib 19.24.6 in place of 19.24.0, numpy 2.2.6 in place of 1.23.4, and scikit-image 0.24.0, tqdm, and `setuptools<81` added. librosa 0.9.2 needs `pkg_resources`, which setuptools 81 removed.
+- `train.py` (new, not from upstream): see "About train.py" below.
+
+## Errors this fork fixes
+
+| Error with upstream code and current packages | Cause |
+|---|---|
+| `ModuleNotFoundError: No module named 'torchvision.transforms.functional_tensor'` | torchvision 0.17 or later with basicsr 1.4.2 (upstream issues #224, #246) |
+| `AttributeError: _2D` | face-alignment 1.4 or later |
+| `AttributeError: module 'numpy' has no attribute 'VisibleDeprecationWarning'` | NumPy 2 (upstream issue #274) |
+| `AttributeError: module 'numpy' has no attribute 'int'.` | NumPy 1.24 or later, in `third_part/face_detection/utils.py` |
+| `ModuleNotFoundError: No module named 'pkg_resources'` | librosa 0.9.2 with setuptools 81 or later |
+
+## Install
+
+These are the steps used for the test below, with [uv](https://docs.astral.sh/uv/) on macOS:
+
+```
+git clone https://github.com/nawta/video-retalking_legacy.git
+cd video-retalking_legacy
+uv venv -p 3.10
+source .venv/bin/activate
+uv pip install torch torchvision
+uv pip install -r requirements.txt
+```
+
+You also need the `ffmpeg` command. On a CUDA machine, pick the `torch` build for your CUDA version from <https://pytorch.org/get-started/locally/>.
+
+On the Apple Silicon Mac used for testing, building dlib 19.24.6 from source failed. With an Intel (Rosetta) `cmake` on the PATH, it built an x86_64 module that Python could not load. With an arm64 `cmake`, the bundled libpng failed with `fatal error: 'fp.h' file not found`. The test below used the prebuilt `dlib-bin` package (20.0.1.post1) instead: `uv pip uninstall dlib && uv pip install dlib-bin`.
+
+The pretrained models are listed in the upstream section below. They total about 3.9 GB and come from <https://github.com/vinthony/video-retalking/releases/tag/v0.0.1>.
+
+## Tested environment
+
+Only installation and imports were tested. Full inference was not run because the checkpoints were not downloaded. CUDA, `webUI.py`, and `predict.py` were not tested.
+
+| Item | Value |
+|---|---|
+| Machine | Apple M5 Max, macOS 26.5.2, CPU only |
+| Python | 3.10.20 (uv) |
+| Packages | torch 2.14.1, torchvision 0.29.1, numpy 2.2.6, basicsr 1.4.2, face-alignment 1.3.4, kornia 0.5.1, librosa 0.9.2, scikit-image 0.24.0, opencv-python 5.0.0.93, dlib-bin 20.0.1.post1 |
+| `python inference.py --help` | All imports succeed and the help text prints |
+| `utils/audio.py` | Computes an (80, 161) mel spectrogram from a 2 s test tone |
+| `LandmarksType` fallback | Checked against face-alignment 1.3.4 and 1.5.0 |
+
+## About train.py
+
+`train.py` was added in this fork and does not exist upstream. It is an unfinished outline of the training procedure in the paper and cannot train the models:
+
+- It fails at import with `ModuleNotFoundError: No module named 'face3d'` because it does not add `third_part` to `sys.path`. After adding `third_part` to the path and importing `utils/torchvision_compat.py`, it fails with `AttributeError: 'Namespace' object has no attribute 'DNet_path'` because the argument parser does not define the checkpoint paths that `load_DNet` reads.
+- The dataset class returns random tensors, and the lip-sync loss always returns 0.
+- The discriminator passes a 64-channel output into a layer that expects 512 channels.
+
+***
+
 <div align="center">
 
 <h2>VideoReTalking <br/> <span style="font-size:12px">Audio-based Lip Synchronization for Talking Head Video Editing in the Wild</span> </h2> 
@@ -51,9 +116,10 @@ https://user-images.githubusercontent.com/4397546/224310754-665eb2dd-aadc-47dc-b
 
 ## Environment
 ```
+# Upstream instructions. For this fork, see "Install" at the top of this file.
 git clone https://github.com/vinthony/video-retalking.git
 cd video-retalking
-conda create -n video_retalking python=3.9
+conda create -n video_retalking python=3.8
 conda activate video_retalking
 
 conda install ffmpeg
