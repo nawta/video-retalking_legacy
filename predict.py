@@ -13,6 +13,7 @@ import torch
 import cv2
 from cog import BasePredictor, Input, Path
 
+import utils.torchvision_compat  # must run before basicsr is imported
 sys.path.insert(0, "third_part")
 sys.path.insert(0, "third_part/GPEN")
 sys.path.insert(0, "third_part/GFPGAN")

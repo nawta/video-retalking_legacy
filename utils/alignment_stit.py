@@ -151,7 +151,7 @@ def crop_faces(IMAGE_SIZE, files, scale, center_sigma=0.0, xy_sigma=0.0, use_fa=
     if use_fa:
         if fa == None:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
-            fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=True, device=device)
+            fa = face_alignment.FaceAlignment(getattr(face_alignment.LandmarksType, "TWO_D", None) or face_alignment.LandmarksType._2D, flip_input=True, device=device)
         predictor = None
         detector = None
     else:

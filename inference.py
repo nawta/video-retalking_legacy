@@ -4,6 +4,7 @@ from tqdm import tqdm
 from PIL import Image
 from scipy.io import loadmat
 
+import utils.torchvision_compat  # must run before basicsr is imported
 sys.path.insert(0, 'third_part')
 sys.path.insert(0, 'third_part/GPEN')
 sys.path.insert(0, 'third_part/GFPGAN')
